@@ -4,34 +4,43 @@
 	public class BoxShooter : BaseTool
 	{
 		TimeSince timeSinceShoot;
+		bool useCollisions = false;
 
 		public override void Simulate()
 		{
-			if ( Host.IsServer )
+			if ( Host.IsClient )
 			{
 				if ( Input.Pressed( InputButton.Attack1 ) )
 				{
 					ShootBox();
 				}
 
-				if ( Input.Down( InputButton.Attack2 ) && timeSinceShoot > 0.05f )
+				if ( Input.Pressed( InputButton.Attack2 ))
 				{
-					timeSinceShoot = 0;
-					ShootBox();
+					Log.Info( "Shoot Trace" );
+					var tr = Trace.Ray( Owner.EyePos, Owner.EyePos + Owner.EyeRot.Forward * 2500 ).Ignore(Owner).Run();
+					DebugOverlay.Line( tr.StartPos, tr.EndPos, 10, true );
+					Log.Info( $"Trace Hit? {tr.Hit}" );
 				}
 			}
 		}
 
 		void ShootBox()
 		{
-			var ent = new Prop
+			useCollisions = !useCollisions;
+			Log.Info( $"Use Collisions? {useCollisions}." );
+
+			var ent = new ModelEntity
 			{
 				Position = Owner.EyePos + Owner.EyeRot.Forward * 50,
 				Rotation = Owner.EyeRot
 			};
 
 			ent.SetModel( "models/citizen_props/crate01.vmdl" );
-			ent.Velocity = Owner.EyeRot.Forward * 1000;
+			if (useCollisions)
+			{
+				ent.SetupPhysicsFromModel( PhysicsMotionType.Keyframed );
+			} 
 		}
 	}
 }
