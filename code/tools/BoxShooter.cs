@@ -7,7 +7,7 @@
 
 		public override void Simulate()
 		{
-			if ( Host.IsServer )
+			if ( Host.IsClient )
 			{
 				if ( Input.Pressed( InputButton.Attack1 ) )
 				{
@@ -24,14 +24,14 @@
 
 		void ShootBox()
 		{
-			var ent = new Prop
+			var ent = new ModelEntity
 			{
-				Position = Owner.EyePos + Owner.EyeRot.Forward * 50,
 				Rotation = Owner.EyeRot
 			};
 
 			ent.SetModel( "models/citizen_props/crate01.vmdl" );
-			ent.Velocity = Owner.EyeRot.Forward * 1000;
+			ent.SetupPhysicsFromModel( PhysicsMotionType.Keyframed );
+			ent.Position = Owner.EyePos + Owner.EyeRot.Forward * 50;
 		}
 	}
 }
