@@ -4,7 +4,7 @@
 	public class BoxShooter : BaseTool
 	{
 		TimeSince timeSinceShoot;
-
+		ModelEntity box;
 		public override void Simulate()
 		{
 			if ( Host.IsClient )
@@ -14,24 +14,29 @@
 					ShootBox();
 				}
 
-				if ( Input.Down( InputButton.Attack2 ) && timeSinceShoot > 0.05f )
+				if ( Input.Down( InputButton.Attack2 ))
 				{
-					timeSinceShoot = 0;
-					ShootBox();
+					using ( Prediction.Off() )
+					{
+						box.Position = Owner.EyePos + Owner.EyeRot.Forward * 500;
+						box.ResetInterpolation();
+						//box.PhysicsBody.Position = box.Position;
+					}
 				}
 			}
 		}
 
 		void ShootBox()
 		{
-			var ent = new ModelEntity
+			box = new ModelEntity
 			{
 				Rotation = Owner.EyeRot
 			};
 
-			ent.SetModel( "models/citizen_props/crate01.vmdl" );
-			ent.SetupPhysicsFromModel( PhysicsMotionType.Keyframed );
-			ent.Position = Owner.EyePos + Owner.EyeRot.Forward * 50;
+			box.SetModel( "models/citizen_props/crate01.vmdl" );
+			box.SetupPhysicsFromModel( PhysicsMotionType.Keyframed );
+			box.Position = Owner.EyePos + Owner.EyeRot.Forward * 500;
+			//ent.PhysicsBody.Position = ent.Position;
 		}
 	}
 }
